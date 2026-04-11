@@ -18,11 +18,10 @@ export async function GET(request: NextRequest) {
 
     // 验证token
     const decoded = jwt.verify(token, 'your-secret-key') as any;
-    if (!decoded) {
-      return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
+    if (!decoded || decoded.role !== 'admin') {
+      return NextResponse.json({ error: 'Unauthorized: admin only' }, { status: 403 });
     }
 
-    // 获取所有用户
     const db = await openDb();
     const users = await db.all('SELECT id, username, role, created_at FROM users');
     await db.close();
@@ -56,6 +55,10 @@ export async function POST(request: NextRequest) {
     const { username, password, role } = await request.json();
     if (!username || !password || !role) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+    }
+
+    if (role === 'admin') {
+      return NextResponse.json({ error: 'Cannot create admin user: system allows only one admin' }, { status: 400 });
     }
 
     // 检查用户名是否已存在

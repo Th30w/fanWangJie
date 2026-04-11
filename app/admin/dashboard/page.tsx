@@ -6,28 +6,32 @@ import Link from 'next/link';
 const { Header, Content, Sider } = Layout;
 const { Title, Text, Paragraph } = Typography;
 
-const menuItems = [
-  {
-    key: '/admin/dashboard',
-    label: <Link href="/admin/dashboard">仪表盘</Link>,
-  },
-  {
-    key: '/admin/users',
-    label: <Link href="/admin/users">用户管理</Link>,
-  },
-  {
-    key: '/admin/articles',
-    label: <Link href="/admin/articles">文章管理</Link>,
-  },
-  {
-    key: '/admin/submissions',
-    label: <Link href="/admin/submissions">投稿管理</Link>,
-  },
-  {
-    key: '/admin/stories',
-    label: <Link href="/admin/stories">人物专栏管理</Link>,
-  },
-];
+const getMenuItems = (role: string) => {
+  const items = [
+    {
+      key: '/admin/dashboard',
+      label: <Link href="/admin/dashboard">仪表盘</Link>,
+    },
+    {
+      key: '/admin/users',
+      label: <Link href="/admin/users">用户管理</Link>,
+      adminOnly: true,
+    },
+    {
+      key: '/admin/articles',
+      label: <Link href="/admin/articles">文章管理</Link>,
+    },
+    {
+      key: '/admin/submissions',
+      label: <Link href="/admin/submissions">投稿管理</Link>,
+    },
+    {
+      key: '/admin/stories',
+      label: <Link href="/admin/stories">人物专栏管理</Link>,
+    },
+  ];
+  return items.filter(item => !(item as any).adminOnly || role === 'admin');
+};
 
 export default function Dashboard() {
   const [user, setUser] = useState<any>(null);
@@ -102,22 +106,24 @@ export default function Dashboard() {
             mode="inline"
             defaultSelectedKeys={['/admin/dashboard']}
             style={{ height: '100%', borderRight: 0 }}
-            items={menuItems}
+            items={getMenuItems(user?.role)}
           />
         </Sider>
         <Content style={{ padding: '32px' }}>
           <Row gutter={16} style={{ marginBottom: '24px' }}>
-            <Col xs={24} md={8}>
-              <Card>
-                <Title level={4} style={{ marginBottom: '16px' }}>用户管理</Title>
-                <Paragraph style={{ marginBottom: '24px' }}>
-                  管理系统用户，包括添加、编辑和删除用户
-                </Paragraph>
-                <Button>
-                  <Link href="/admin/users">查看用户</Link>
-                </Button>
-              </Card>
-            </Col>
+            {user.role === 'admin' && (
+              <Col xs={24} md={8}>
+                <Card>
+                  <Title level={4} style={{ marginBottom: '16px' }}>用户管理</Title>
+                  <Paragraph style={{ marginBottom: '24px' }}>
+                    管理系统用户，包括添加、编辑和删除用户
+                  </Paragraph>
+                  <Button>
+                    <Link href="/admin/users">查看用户</Link>
+                  </Button>
+                </Card>
+              </Col>
+            )}
             <Col xs={24} md={8}>
               <Card>
                 <Title level={4} style={{ marginBottom: '16px' }}>文章管理</Title>

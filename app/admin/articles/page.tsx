@@ -7,28 +7,32 @@ const { Header, Content, Sider } = Layout;
 const { Title, Text } = Typography;
 const { TextArea } = Input;
 
-const menuItems = [
-  {
-    key: '/admin/dashboard',
-    label: <Link href="/admin/dashboard">仪表盘</Link>,
-  },
-  {
-    key: '/admin/users',
-    label: <Link href="/admin/users">用户管理</Link>,
-  },
-  {
-    key: '/admin/articles',
-    label: <Link href="/admin/articles">文章管理</Link>,
-  },
-  {
-    key: '/admin/submissions',
-    label: <Link href="/admin/submissions">投稿管理</Link>,
-  },
-  {
-    key: '/admin/stories',
-    label: <Link href="/admin/stories">人物专栏管理</Link>,
-  },
-];
+const getMenuItems = (role: string) => {
+  const items = [
+    {
+      key: '/admin/dashboard',
+      label: <Link href="/admin/dashboard">仪表盘</Link>,
+    },
+    {
+      key: '/admin/users',
+      label: <Link href="/admin/users">用户管理</Link>,
+      adminOnly: true,
+    },
+    {
+      key: '/admin/articles',
+      label: <Link href="/admin/articles">文章管理</Link>,
+    },
+    {
+      key: '/admin/submissions',
+      label: <Link href="/admin/submissions">投稿管理</Link>,
+    },
+    {
+      key: '/admin/stories',
+      label: <Link href="/admin/stories">人物专栏管理</Link>,
+    },
+  ];
+  return items.filter(item => !(item as any).adminOnly || role === 'admin');
+};
 
 export default function Articles() {
   const [articles, setArticles] = useState<any[]>([]);
@@ -283,7 +287,7 @@ export default function Articles() {
             mode="inline"
             defaultSelectedKeys={['/admin/articles']}
             style={{ height: '100%', borderRight: 0 }}
-            items={menuItems}
+            items={getMenuItems(user?.role)}
           />
         </Sider>
         <Content style={{ padding: '32px' }}>

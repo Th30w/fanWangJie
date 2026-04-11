@@ -6,28 +6,32 @@ import Link from 'next/link';
 const { Header, Content, Sider } = Layout;
 const { Title, Text } = Typography;
 
-const menuItems = [
-  {
-    key: '/admin/dashboard',
-    label: <Link href="/admin/dashboard">仪表盘</Link>,
-  },
-  {
-    key: '/admin/users',
-    label: <Link href="/admin/users">用户管理</Link>,
-  },
-  {
-    key: '/admin/articles',
-    label: <Link href="/admin/articles">文章管理</Link>,
-  },
-  {
-    key: '/admin/submissions',
-    label: <Link href="/admin/submissions">投稿管理</Link>,
-  },
-  {
-    key: '/admin/stories',
-    label: <Link href="/admin/stories">人物专栏管理</Link>,
-  },
-];
+const getMenuItems = (role: string) => {
+  const items = [
+    {
+      key: '/admin/dashboard',
+      label: <Link href="/admin/dashboard">仪表盘</Link>,
+    },
+    {
+      key: '/admin/users',
+      label: <Link href="/admin/users">用户管理</Link>,
+      adminOnly: true,
+    },
+    {
+      key: '/admin/articles',
+      label: <Link href="/admin/articles">文章管理</Link>,
+    },
+    {
+      key: '/admin/submissions',
+      label: <Link href="/admin/submissions">投稿管理</Link>,
+    },
+    {
+      key: '/admin/stories',
+      label: <Link href="/admin/stories">人物专栏管理</Link>,
+    },
+  ];
+  return items.filter(item => !(item as any).adminOnly || role === 'admin');
+};
 
 export default function Users() {
   const [users, setUsers] = useState<any[]>([]);
@@ -278,7 +282,7 @@ export default function Users() {
             mode="inline"
             defaultSelectedKeys={['/admin/users']}
             style={{ height: '100%', borderRight: 0 }}
-            items={menuItems}
+            items={getMenuItems(user?.role)}
           />
         </Sider>
         <Content style={{ padding: '32px' }}>
@@ -322,9 +326,11 @@ export default function Users() {
                 label="角色"
                 rules={[{ required: true, message: '请选择角色' }]}
               >
-                <Select>
+                <Select disabled={currentUser?.role === 'admin'}>
                   <Select.Option value="user">用户</Select.Option>
-                  <Select.Option value="admin">管理员</Select.Option>
+                  {currentUser?.role === 'admin' && (
+                    <Select.Option value="admin">管理员</Select.Option>
+                  )}
                 </Select>
               </Form.Item>
               <Form.Item>
@@ -375,7 +381,6 @@ export default function Users() {
               >
                 <Select>
                   <Select.Option value="user">用户</Select.Option>
-                  <Select.Option value="admin">管理员</Select.Option>
                 </Select>
               </Form.Item>
               <Form.Item>

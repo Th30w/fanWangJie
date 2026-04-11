@@ -2,8 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { openDb } from '../../../../lib/db';
 import jwt from 'jsonwebtoken';
 
-// 更新投稿状态
-export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const authHeader = request.headers.get('Authorization');
     if (!authHeader) {
@@ -15,7 +14,6 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
       return NextResponse.json({ error: 'Token is required' }, { status: 401 });
     }
 
-    // 验证token
     const decoded = jwt.verify(token, 'your-secret-key') as any;
     if (!decoded) {
       return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
@@ -26,19 +24,18 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
       return NextResponse.json({ error: 'Invalid status' }, { status: 400 });
     }
 
-    // 检查投稿是否存在
+    const { id } = await params;
     const db = await openDb();
-    const submission = await db.get('SELECT * FROM submissions WHERE id = ?', params.id);
+    const submission = await db.get('SELECT * FROM submissions WHERE id = ?', id);
     if (!submission) {
       await db.close();
       return NextResponse.json({ error: 'Submission not found' }, { status: 404 });
     }
 
-    // 更新投稿状态
     await db.run(
       'UPDATE submissions SET status = ? WHERE id = ?',
       status,
-      params.id
+      id
     );
     await db.close();
 
@@ -49,8 +46,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
   }
 }
 
-// 删除投稿
-export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const authHeader = request.headers.get('Authorization');
     if (!authHeader) {
@@ -62,22 +58,20 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
       return NextResponse.json({ error: 'Token is required' }, { status: 401 });
     }
 
-    // 验证token
     const decoded = jwt.verify(token, 'your-secret-key') as any;
     if (!decoded) {
       return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
     }
 
-    // 检查投稿是否存在
+    const { id } = await params;
     const db = await openDb();
-    const submission = await db.get('SELECT * FROM submissions WHERE id = ?', params.id);
+    const submission = await db.get('SELECT * FROM submissions WHERE id = ?', id);
     if (!submission) {
       await db.close();
       return NextResponse.json({ error: 'Submission not found' }, { status: 404 });
     }
 
-    // 删除投稿
-    await db.run('DELETE FROM submissions WHERE id = ?', params.id);
+    await db.run('DELETE FROM submissions WHERE id = ?', id);
     await db.close();
 
     return NextResponse.json({ message: 'Submission deleted successfully' }, { status: 200 });

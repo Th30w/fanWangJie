@@ -6,28 +6,32 @@ import Link from 'next/link';
 const { Header, Content, Sider } = Layout;
 const { Title, Text, Paragraph } = Typography;
 
-const menuItems = [
-  {
-    key: '/admin/dashboard',
-    label: <Link href="/admin/dashboard">仪表盘</Link>,
-  },
-  {
-    key: '/admin/users',
-    label: <Link href="/admin/users">用户管理</Link>,
-  },
-  {
-    key: '/admin/articles',
-    label: <Link href="/admin/articles">文章管理</Link>,
-  },
-  {
-    key: '/admin/submissions',
-    label: <Link href="/admin/submissions">投稿管理</Link>,
-  },
-  {
-    key: '/admin/stories',
-    label: <Link href="/admin/stories">人物专栏管理</Link>,
-  },
-];
+const getMenuItems = (role: string) => {
+  const items = [
+    {
+      key: '/admin/dashboard',
+      label: <Link href="/admin/dashboard">仪表盘</Link>,
+    },
+    {
+      key: '/admin/users',
+      label: <Link href="/admin/users">用户管理</Link>,
+      adminOnly: true,
+    },
+    {
+      key: '/admin/articles',
+      label: <Link href="/admin/articles">文章管理</Link>,
+    },
+    {
+      key: '/admin/submissions',
+      label: <Link href="/admin/submissions">投稿管理</Link>,
+    },
+    {
+      key: '/admin/stories',
+      label: <Link href="/admin/stories">人物专栏管理</Link>,
+    },
+  ];
+  return items.filter(item => !(item as any).adminOnly || role === 'admin');
+};
 
 export default function Submissions() {
   const [submissions, setSubmissions] = useState<any[]>([]);
@@ -241,7 +245,7 @@ export default function Submissions() {
             mode="inline"
             defaultSelectedKeys={['/admin/submissions']}
             style={{ height: '100%', borderRight: 0 }}
-            items={menuItems}
+            items={getMenuItems(user?.role)}
           />
         </Sider>
         <Content style={{ padding: '32px' }}>

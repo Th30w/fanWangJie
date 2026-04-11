@@ -1,69 +1,53 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { Layout, Menu, Table, Button, Modal, Form, Input, Upload, Typography, Space, message, Spin, Card, Popconfirm, DatePicker, List } from 'antd';
-import { UploadOutlined, PlusOutlined, DeleteOutlined, EditOutlined, PaperClipOutlined, DownloadOutlined } from '@ant-design/icons';
-import dayjs from 'dayjs';
+import { Layout, Menu, Table, Button, Modal, Form, Input, Upload, Typography, Space, message, Spin, Card, Popconfirm, List } from 'antd';
+import { UploadOutlined, PlusOutlined, DeleteOutlined, PaperClipOutlined, DownloadOutlined } from '@ant-design/icons';
+
 import Link from 'next/link';
 
 const { Header, Content, Sider } = Layout;
 const { Title, Text } = Typography;
 const { TextArea } = Input;
 
-const menuItems = [
-  {
-    key: '/admin/dashboard',
-    label: <Link href="/admin/dashboard">仪表盘</Link>,
-  },
-  {
-    key: '/admin/users',
-    label: <Link href="/admin/users">用户管理</Link>,
-  },
-  {
-    key: '/admin/articles',
-    label: <Link href="/admin/articles">文章管理</Link>,
-  },
-  {
-    key: '/admin/submissions',
-    label: <Link href="/admin/submissions">投稿管理</Link>,
-  },
-  {
-    key: '/admin/stories',
-    label: <Link href="/admin/stories">人物专栏管理</Link>,
-  },
-];
+const getMenuItems = (role: string) => {
+  const items = [
+    {
+      key: '/admin/dashboard',
+      label: <Link href="/admin/dashboard">仪表盘</Link>,
+    },
+    {
+      key: '/admin/users',
+      label: <Link href="/admin/users">用户管理</Link>,
+      adminOnly: true,
+    },
+    {
+      key: '/admin/articles',
+      label: <Link href="/admin/articles">文章管理</Link>,
+    },
+    {
+      key: '/admin/submissions',
+      label: <Link href="/admin/submissions">投稿管理</Link>,
+    },
+    {
+      key: '/admin/stories',
+      label: <Link href="/admin/stories">人物专栏管理</Link>,
+    },
+  ];
+  return items.filter(item => !(item as any).adminOnly || role === 'admin');
+};
 
 const TimelineEditor = (props: any) => {
   const { value = [], onChange } = props;
-  const [editingRecord, setEditingRecord] = useState<any>(null);
-  const [editingIndex, setEditingIndex] = useState<number | null>(null);
-  const [form] = Form.useForm();
 
   const handleAdd = () => {
     const newItem = { _key: Date.now().toString(), date: '', content: '' };
-    const newTimeline = [...value, newItem];
+    onChange([...value, newItem]);
+  };
+
+  const handleChange = (index: number, field: string, val: string) => {
+    const newTimeline = [...value];
+    newTimeline[index] = { ...newTimeline[index], [field]: val };
     onChange(newTimeline);
-  };
-
-  const handleEdit = (record: any, index: number) => {
-    const formattedRecord = {
-      ...record,
-      date: record.date ? dayjs(record.date) : null
-    };
-    setEditingRecord(formattedRecord);
-    setEditingIndex(index);
-  };
-
-  const handleSave = (values: any) => {
-    if (editingIndex !== null) {
-      const newTimeline = [...value];
-      newTimeline[editingIndex] = {
-        ...values,
-        date: values.date ? values.date.format('YYYY-MM-DD') : '',
-      };
-      onChange(newTimeline);
-      setEditingRecord(null);
-      setEditingIndex(null);
-    }
   };
 
   const handleDelete = (index: number) => {
@@ -71,97 +55,48 @@ const TimelineEditor = (props: any) => {
     onChange(newTimeline);
   };
 
-  const columns = [
-    {
-      title: '日期',
-      dataIndex: 'date',
-      key: 'date',
-      render: (text: string) => text || '-',
-    },
-    {
-      title: '内容',
-      dataIndex: 'content',
-      key: 'content',
-      render: (text: string) => text || '-',
-    },
-    {
-      title: '操作',
-      key: 'action',
-      render: (_: any, record: any, index: number) => (
-        <Space size="middle">
-          <Button type="primary" icon={<EditOutlined />} onClick={() => handleEdit(record, index)} />
-          <Popconfirm
-            title="确定要删除这个时间线条目吗？"
-            onConfirm={() => handleDelete(index)}
-            okText="确定"
-            cancelText="取消"
-          >
-            <Button danger icon={<DeleteOutlined />} />
-          </Popconfirm>
-        </Space>
-      ),
-    },
-  ];
-
   return (
     <Card>
-      <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'flex-end' }}>
+      <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'flex-end' }}>
         <Button type="primary" icon={<PlusOutlined />} onClick={handleAdd}>
           添加时间线条目
         </Button>
       </div>
-      <Table
-        dataSource={value}
-        columns={columns}
-        rowKey={(record) => record._key || Date.now().toString()}
-        pagination={false}
-      />
-      
-      {editingRecord && (
-        <Modal
-          title="编辑时间线条目"
-          open={!!editingRecord}
-          onCancel={() => {
-            setEditingRecord(null);
-            setEditingIndex(null);
-          }}
-          footer={null}
-        >
-          <Form
-            form={form}
-            initialValues={editingRecord}
-            onFinish={handleSave}
-          >
-            <Form.Item
-              name="date"
-              label="日期"
-              rules={[{ required: true, message: '请输入日期' }]}
-            >
-              <DatePicker style={{ width: '100%' }} />
-            </Form.Item>
-            <Form.Item
-              name="content"
-              label="内容"
-              rules={[{ required: true, message: '请输入内容' }]}
-            >
-              <TextArea rows={4} />
-            </Form.Item>
-            <Form.Item>
-              <Space style={{ width: '100%', justifyContent: 'space-between' }}>
-                <Button onClick={() => {
-                  setEditingRecord(null);
-                  setEditingIndex(null);
-                }}>
-                  取消
-                </Button>
-                <Button type="primary" htmlType="submit">
-                  保存
-                </Button>
-              </Space>
-            </Form.Item>
-          </Form>
-        </Modal>
+      {value.length === 0 && (
+        <div style={{ textAlign: 'center', padding: 20, color: '#999' }}>
+          暂无时间线条目，点击上方按钮添加
+        </div>
       )}
+      {value.map((item: any, index: number) => (
+        <Card
+          key={item._key || index}
+          size="small"
+          style={{ marginBottom: 8 }}
+          extra={
+            <Popconfirm
+              title="确定要删除这个时间线条目吗？"
+              onConfirm={() => handleDelete(index)}
+              okText="确定"
+              cancelText="取消"
+            >
+              <Button danger size="small" icon={<DeleteOutlined />} />
+            </Popconfirm>
+          }
+        >
+          <Input
+            placeholder="日期 (如: 2024-01-16)"
+            value={item.date}
+            onChange={(e) => handleChange(index, 'date', e.target.value)}
+            style={{ marginBottom: 8 }}
+          />
+          <TextArea
+            placeholder="事件内容"
+            value={item.content}
+            onChange={(e) => handleChange(index, 'content', e.target.value)}
+            rows={3}
+          />
+        </Card>
+      ))}
     </Card>
   );
 };
@@ -575,7 +510,7 @@ export default function StoriesManagement() {
             mode="inline"
             defaultSelectedKeys={['/admin/stories']}
             style={{ height: '100%', borderRight: 0 }}
-            items={menuItems}
+            items={getMenuItems(user?.role)}
           />
         </Sider>
         <Content style={{ padding: '32px' }}>
