@@ -76,10 +76,16 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
       const mimeType = image.type || 'image/jpeg';
       imageBase64 = `data:${mimeType};base64,${buffer.toString('base64')}`;
     } else {
-      const db = await openDb();
-      const existing = await db.get('SELECT image FROM stories WHERE id = ?', id);
-      await db.close();
-      imageBase64 = existing?.image || '';
+      // 检查是否有特殊标记表示要删除图片
+      const removeImage = formData.get('remove_image') as string;
+      if (removeImage === 'true') {
+        imageBase64 = '';
+      } else {
+        const db = await openDb();
+        const existing = await db.get('SELECT image FROM stories WHERE id = ?', id);
+        await db.close();
+        imageBase64 = existing?.image || '';
+      }
     }
 
     const db = await openDb();

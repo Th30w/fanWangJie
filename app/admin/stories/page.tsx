@@ -268,11 +268,16 @@ export default function StoriesManagement() {
       formData.append('psychological_impact', values.psychological_impact || '');
       formData.append('expert_opinions', values.expert_opinions || '');
       formData.append('conclusion', values.conclusion || '');
+      
+      // 检查是否有图片文件
       if (values.image && values.image.length > 0) {
         const file = values.image[0];
         if (file.originFileObj) {
           formData.append('image', file.originFileObj);
         }
+      } else {
+        // 如果没有图片，添加标记表示要删除图片
+        formData.append('remove_image', 'true');
       }
 
       const response = await fetch(`/api/stories/${currentStory.id}`, {
@@ -613,6 +618,9 @@ export default function StoriesManagement() {
                   listType="picture"
                   maxCount={1}
                   beforeUpload={() => false}
+                  onRemove={() => {
+                    form.setFieldsValue({ image: [] });
+                  }}
                 >
                   <Button icon={<UploadOutlined />}>上传图片</Button>
                 </Upload>
@@ -743,6 +751,9 @@ export default function StoriesManagement() {
                   listType="picture"
                   maxCount={1}
                   beforeUpload={() => false}
+                  onRemove={() => {
+                    form.setFieldsValue({ image: [] });
+                  }}
                 >
                   <Button icon={<UploadOutlined />}>上传图片</Button>
                 </Upload>

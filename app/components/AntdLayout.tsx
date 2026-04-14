@@ -12,7 +12,9 @@ export default function AntdLayout({ children }: { children: React.ReactNode }) 
   const menuItems = [
     { key: '/', label: <Link href="/">首页</Link> },
     { key: '/about', label: <Link href="/about">关于网戒</Link> },
+    { key: '/articles', label: <Link href="/articles">文章列表</Link> },
     { key: '/stories', label: <Link href="/stories">真实故事</Link> },
+    { key: '/institutions', label: <Link href="/institutions">戒网瘾学习查询</Link> },
     { key: '/resources', label: <Link href="/resources">帮助资源</Link> },
     { key: '/contact', label: <Link href="/contact">联系投稿</Link> },
   ];

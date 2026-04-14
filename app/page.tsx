@@ -1,10 +1,44 @@
 "use client"; // 关键：声明为客户端组件
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { Row, Col, Card, Button, Typography, Space } from 'antd';
+import { Row, Col, Card, Button, Typography, Space, Spin } from 'antd';
+import Link from 'next/link';
 
 const { Title, Paragraph, Text } = Typography;
 
+interface Story {
+  id: number;
+  name: string;
+  background: string;
+  image: string;
+}
+
 export default function Home() {
+  const [story, setStory] = useState<Story | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchLatestStory = async () => {
+      try {
+        const response = await fetch('/api/stories');
+        if (response.ok) {
+          const data = await response.json();
+          if (data.stories && data.stories.length > 0) {
+            // 获取最新的故事（按ID降序）
+            const latestStory = data.stories.sort((a: Story, b: Story) => b.id - a.id)[0];
+            setStory(latestStory);
+          }
+        }
+      } catch (error) {
+        console.error('获取故事失败:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchLatestStory();
+  }, []);
+
   return (
     <div>
       <div style={{ textAlign: 'center', padding: '80px 0' }}>
@@ -13,7 +47,7 @@ export default function Home() {
           网络成瘾不是疾病，而是需要理解和支持的心理问题
         </Paragraph>
         <Button type="primary" size="large">
-          <a href="/about" style={{ color: '#fff' }}>了解更多</a>
+          <Link href="/about" style={{ color: '#fff' }}>了解更多</Link>
         </Button>
       </div>
 
@@ -40,7 +74,7 @@ export default function Home() {
             </Col>
             <Col xs={24} md={12}>
               <Image 
-                src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=teenager%20using%20computer%20responsibly%20in%20a%20supportive%20environment&image_size=landscape_16_9" 
+                src="/index.png" 
                 alt="青少年合理使用网络" 
                 width={600} 
                 height={400} 
@@ -51,34 +85,51 @@ export default function Home() {
         </div>
       </section>
 
-      <section style={{ padding: '48px 0', backgroundColor: '#f5f5f5' }}>
+      <section style={{ padding: '48px 0' }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 24px' }}>
           <Title level={2} style={{ marginBottom: '32px' }}>真实故事</Title>
-          <Card style={{ padding: '32px' }}>
-            <Row gutter={32} align="middle">
-              <Col xs={24} md={12}>
-                <Title level={3} style={{ marginBottom: '16px' }}>裴佳怡的经历</Title>
-                <Paragraph style={{ marginBottom: '16px' }}>
-                  裴佳怡是一名大学生，她的父母因为她谈恋爱而对她进行了长期的精神虐待和威胁。父母多次威胁要打断她的腿、扇肿她的脸、到学校闹、给她办休学等，这些行为严重伤害了她的心理健康。
-                </Paragraph>
-                <Paragraph style={{ marginBottom: '24px' }}>
-                  她的经历反映了许多家庭在面对青少年问题时的错误处理方式，以及传统观念对青少年的束缚和伤害。
-                </Paragraph>
-                <Button>
-                  <a href="/stories">查看完整故事</a>
-                </Button>
-              </Col>
-              <Col xs={24} md={12}>
-                <Image 
-                  src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=young%20woman%20looking%20sad%20and%20distressed%20in%20a%20room&image_size=portrait_4_3" 
-                  alt="裴佳怡的故事" 
-                  width={400} 
-                  height={500} 
-                  style={{ borderRadius: '8px', boxShadow: '0 4px 12px rgba(0,0,0,0.15)', width: '100%', height: 'auto' }}
-                />
-              </Col>
-            </Row>
-          </Card>
+          {loading ? (
+            <div style={{ display: 'flex', justifyContent: 'center', padding: '64px 0' }}>
+              <Spin size="large" />
+            </div>
+          ) : story ? (
+            <Card style={{ padding: '32px' }}>
+              <Row gutter={32} align="middle">
+                <Col xs={24} md={12}>
+                  <Title level={3} style={{ marginBottom: '16px' }}>{story.name}的经历</Title>
+                  <Paragraph style={{ marginBottom: '16px' }}>
+                    {story.background.length > 200 ? `${story.background.substring(0, 200)}...` : story.background}
+                  </Paragraph>
+                  <Button>
+                    <Link href={`/stories?id=${story.id}`}>查看完整故事</Link>
+                  </Button>
+                </Col>
+                <Col xs={24} md={12}>
+                  {story.image ? (
+                    <Image 
+                      src={story.image} 
+                      alt={`${story.name}的故事`} 
+                      width={400} 
+                      height={500} 
+                      style={{ borderRadius: '8px', boxShadow: '0 4px 12px rgba(0,0,0,0.15)', width: '100%', height: 'auto' }}
+                    />
+                  ) : (
+                    <Image 
+                      src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=young%20person%20looking%20thoughtful%20in%20a%20room&image_size=portrait_4_3" 
+                      alt={`${story.name}的故事`} 
+                      width={400} 
+                      height={500} 
+                      style={{ borderRadius: '8px', boxShadow: '0 4px 12px rgba(0,0,0,0.15)', width: '100%', height: 'auto' }}
+                    />
+                  )}
+                </Col>
+              </Row>
+            </Card>
+          ) : (
+            <Card style={{ padding: '64px 0', textAlign: 'center' }}>
+              <Text type="secondary">暂无真实故事</Text>
+            </Card>
+          )}
         </div>
       </section>
 

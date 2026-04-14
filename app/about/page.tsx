@@ -49,7 +49,7 @@ export default function About() {
           <Col xs={24} md={12}>
             <Card style={{ marginBottom: '24px' }}>
               <Image 
-                src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=professional%20psychologist%20talking%20to%20teenager%20in%20a%20comfortable%20office&image_size=portrait_4_3" 
+                src="/1.webp" 
                 alt="心理咨询" 
                 width={400} 
                 height={500} 
@@ -58,7 +58,7 @@ export default function About() {
             </Card>
             <Card>
               <Image 
-                src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=family%20sitting%20together%20and%20talking%20in%20a%20living%20room&image_size=portrait_4_3" 
+                src="/2.jpg" 
                 alt="家庭沟通" 
                 width={400} 
                 height={500} 

@@ -81,6 +81,58 @@ export async function initDb() {
     );
   `);
   
+  // 创建戒网瘾机构表
+  await db.exec(`
+    CREATE TABLE IF NOT EXISTS institutions (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT NOT NULL,
+      province TEXT NOT NULL,
+      city TEXT NOT NULL,
+      key_person TEXT,
+      status TEXT,
+      system_tags TEXT,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+  `);
+  
+  // 创建虚拟表用于全文搜索（FTS5）
+  await db.exec(`
+    CREATE VIRTUAL TABLE IF NOT EXISTS institutions_fts USING fts5(
+      name,
+      province,
+      city,
+      key_person,
+      status,
+      system_tags,
+      content='institutions',
+      tokenize='porter'
+    );
+  `);
+  
+  // 创建触发器，当institutions表数据变化时更新虚拟表
+  await db.exec(`
+    CREATE TRIGGER IF NOT EXISTS institutions_ai AFTER INSERT ON institutions BEGIN
+      INSERT INTO institutions_fts(rowid, name, province, city, key_person, status, system_tags) 
+      VALUES (new.id, new.name, new.province, new.city, new.key_person, new.status, new.system_tags);
+    END;
+  `);
+  
+  await db.exec(`
+    CREATE TRIGGER IF NOT EXISTS institutions_ad AFTER DELETE ON institutions BEGIN
+      INSERT INTO institutions_fts(institutions_fts, rowid, name, province, city, key_person, status, system_tags) 
+      VALUES('delete', old.id, old.name, old.province, old.city, old.key_person, old.status, old.system_tags);
+    END;
+  `);
+  
+  await db.exec(`
+    CREATE TRIGGER IF NOT EXISTS institutions_au AFTER UPDATE ON institutions BEGIN
+      INSERT INTO institutions_fts(institutions_fts, rowid, name, province, city, key_person, status, system_tags) 
+      VALUES('delete', old.id, old.name, old.province, old.city, old.key_person, old.status, old.system_tags);
+      INSERT INTO institutions_fts(rowid, name, province, city, key_person, status, system_tags) 
+      VALUES (new.id, new.name, new.province, new.city, new.key_person, new.status, new.system_tags);
+    END;
+  `);
+  
   // 检查是否已有管理员用户
   const admin = await db.get('SELECT * FROM users WHERE username = ?', 'admin');
   if (!admin) {

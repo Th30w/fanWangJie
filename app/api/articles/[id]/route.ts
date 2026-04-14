@@ -2,6 +2,30 @@ import { NextRequest, NextResponse } from 'next/server';
 import { openDb } from '../../../../lib/db';
 import jwt from 'jsonwebtoken';
 
+// 获取单个文章详情
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  try {
+    const { id } = await params;
+    const db = await openDb();
+    const article = await db.get(`
+      SELECT articles.id, articles.title, articles.content, articles.author_id, articles.created_at, users.username as author_username
+      FROM articles
+      LEFT JOIN users ON articles.author_id = users.id
+      WHERE articles.id = ?
+    `, id);
+    await db.close();
+
+    if (!article) {
+      return NextResponse.json({ error: 'Article not found' }, { status: 404 });
+    }
+
+    return NextResponse.json({ article }, { status: 200 });
+  } catch (error) {
+    console.error('Error getting article:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
+}
+
 export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const authHeader = request.headers.get('Authorization');
