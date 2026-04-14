@@ -1,36 +1,76 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 反网戒 - 反对网络成瘾戒治宣传平台
 
-## Getting Started
+## 项目简介
 
-First, run the development server:
+反网戒是一个致力于反对网络成瘾戒治、守护青少年心理健康的宣传平台。我们旨在通过真实故事、科学知识和支持资源，帮助公众了解网络成瘾的本质，反对不科学、不人道的戒治方法，倡导科学、人道的应对策略。
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## 核心价值
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- **科学认知**：网络成瘾不是疾病，而是需要理解和支持的心理问题
+- **反对暴力**：抵制一切形式的身体和精神虐待式戒治方法
+- **倡导人道**：推广科学、人道的心理干预和家庭支持方法
+- **真实故事**：通过真实案例展示网戒的危害和正确的应对方式
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 主要功能
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 1. 首页
+- 平台简介和核心价值观
+- 最新真实故事展示
+- 网戒危害的简要介绍
+- 帮助资源快速链接
 
-## Learn More
+### 2. 关于网戒
+- 网络成瘾的科学定义
+- 网戒中心的常见问题和危害
+- 科学的应对方法和建议
 
-To learn more about Next.js, take a look at the following resources:
+### 3. 文章列表
+- 专业文章和科普内容
+- 支持Markdown格式的文章展示
+- 按发布时间排序的文章列表
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### 4. 真实故事
+- 真实案例展示
+- 详细的时间线记录
+- 受害者诉求和社会反响
+- 法律分析和专家观点
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### 5. 戒网瘾学习查询
+- 机构信息查询
+- 支持模糊搜索所有字段
+- 详细的机构信息展示
 
-## Deploy on Vercel
+### 6. 帮助资源
+- 心理健康支持热线和服务
+- 法律支持和权益保护
+- 教育资源和家庭沟通技巧
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### 7. 联系投稿
+- 提交真实故事和经历
+- 联系方式和邮箱
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 管理后台
+
+平台提供完整的管理后台，支持：
+- 用户管理（仅管理员）
+- 文章管理（发布、编辑、删除）
+- 投稿管理（审核、处理）
+- 人物专栏管理（创建、编辑、删除）
+- 机构信息管理
+
+## 目标愿景
+
+我们希望通过这个平台，能够：
+1. 提高公众对网络成瘾的科学认知
+2. 揭露不科学网戒方法的危害
+3. 为受影响的青少年和家庭提供支持和资源
+4. 推动社会对青少年心理健康的关注
+5. 倡导建立科学、人道的网络使用指导体系
+
+## 如何参与
+
+如果你有相关的故事、经历或资源，欢迎通过联系投稿页面与我们分享。我们也欢迎专业人士提供专家观点和建议，共同为青少年心理健康事业贡献力量。
+
+---
+
+让我们一起反对暴力网戒，守护青少年心理健康！
